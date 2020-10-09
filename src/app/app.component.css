@@ -1,0 +1,32 @@
+:host {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+.video-container {
+  width: 100vw;
+  height: 100vh;
+  background-color: #333333;
+}
+
+.top-layer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+} 
+
+[holdable] {
+  outline:0;
+  cursor: pointer;
+  border: none;
+  background: green;
+  color: white;
+  width: 60px; 
+  height: 60px;
+  border-radius: 100%;
+}
