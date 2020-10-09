@@ -91,6 +91,7 @@ export class AppComponent implements AfterViewInit, OnInit {
   authdata: any;
   private itemDoc: AngularFirestoreDocument<Videodata>;
   item: Observable<Videodata>;
+  showmyvideo = true;
   constructor(    
     private sanitizer: DomSanitizer,
     private changeDetector: ChangeDetectorRef,
@@ -175,7 +176,7 @@ clickme(){
       }
       const box = this._elementRef.nativeElement.querySelector('.myvideo');
       this.renderer.setProperty(box, 'volume', '0');   
-      //this.video.nativeElement.srcObject = stream;//Only if a new user then start recording the stream -II
+      this.video.nativeElement.srcObject = stream;//Only if a new user then start recording the stream -II
       this.recordings$ = fromEvent(this.mediaRecorder, 'dataavailable')
     }).catch(error => {
       console.log('CANNOT RECORD: ', error);
@@ -252,5 +253,42 @@ clickme(){
   }
   logout(){
     this.ps.logout();
+  }
+  start(){
+    const ms = 100;
+    this.state = RecordingState.RECORDING;
+    this.mediaRecorder.start();
+    this.recordings$.pipe(
+      take(1),
+      pluck('data'),
+      tap((data: BlobPart) => {
+        let blob = new Blob([data],  {
+          type: 'video/webm'
+        });
+        this.renderer.setStyle(this.video.nativeElement, 'visibility', 'hidden');
+        const box = this._elementRef.nativeElement.querySelector('.myrecvideo');
+        this.ps.uploadVideo(blob);
+        this.recvideo.nativeElement.src =  URL.createObjectURL(blob);
+        this.renderer.setProperty(box, 'volume', '1.0');    
+        this.video.nativeElement.srcObject.getTracks().forEach(track => {
+          track.stop();
+          this.changeDetector.detectChanges();
+        });
+      })
+    ).subscribe();
+    interval(ms).pipe(
+      takeUntil(this.stop$),
+      tap(v => {
+        this.seconds = 3 - Math.round((v * ms) / 1000);
+        if (this.seconds === 0 ){
+          this.state = RecordingState.STOPPED;
+          this.stop$.next();
+          this.mediaRecorder.stop();
+          this.showmyvideo = false;
+          this.changeDetector.detectChanges();
+        }
+      }),
+    )
+    .subscribe();
   }
 }

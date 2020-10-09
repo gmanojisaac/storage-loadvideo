@@ -1,6 +1,6 @@
 <div class="video-container" fxLayoutAlign= "center center" >
-  <video class="myvideo" [ngStyle]="{'height': '80vh', 'position': 'fixed' }"   [ngStyle.xs]="{'height': '100vh','width': '120vw', 'position': 'fixed' }" #video autoplay>  </video>
-  <video class="myrecvideo" [ngStyle]="{'height': '80vh', 'position': 'fixed' }"   [ngStyle.xs]="{'height': '100vh','width': '120vw', 'position': 'fixed' }" #recvideo  autoplay loop  > </video>
+  <video class="myvideo" [fxShow]= "showmyvideo" [ngStyle]="{'height': '80vh', 'position': 'fixed' }"   [ngStyle.xs]="{'height': '100vh','width': '120vw', 'position': 'fixed' }" #video autoplay>  </video>
+  <video class="myrecvideo" [fxShow]= "!showmyvideo"  [ngStyle]="{'height': '80vh', 'position': 'fixed' }"   [ngStyle.xs]="{'height': '100vh','width': '120vw', 'position': 'fixed' }" #recvideo  autoplay loop  > </video>
    <!--//pick up from auth-->
   <video src="{{ (item| async)?.itemlocation }}" autoplay></video>  
  <!--// load from collection
@@ -16,6 +16,7 @@
     
     <div *ngIf="afAuth.user | async as user; else showLogin">
       <h1>{{ user.displayName }}!</h1>
+      <button (click)="start()">Start</button>
       <button (click)="logout()">Logout</button>
       
       {{ps.downloadURL | async }}
@@ -30,11 +31,12 @@
   <div class="growing" fxFlex = "grow"></div>
 
   <div fxLayoutAlign="center center">
-    <div  #done [fxShow] = "this.Screentype === 'Handset_Port' || this.Screentype === 'Handset_Land'" >
+    <div  #done [fxShow] = "this.Screentype === 'Handset_Port' || this.Screentype === 'Web_Land'" >
       <button mat-fab color="primary" style="width: 60px; height:60px;">
         {{ state === 'recording' ? seconds : 'REC' }}
       </button>
     </div>
+    <!--
     <div [fxHide] = "this.Screentype === 'Handset_Port' || this.Screentype === 'Handset_Land'" >
       <button
         holdable
@@ -43,6 +45,8 @@
         (stop)="onStop()"
       >{{ state === 'recording' ? seconds : 'REC' }}</button>
     </div>
+    -->
+
   </div>
 
 </div>
