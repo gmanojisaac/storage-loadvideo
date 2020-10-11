@@ -52,7 +52,8 @@ export class PolicyService {
   }
   login() {
     this.auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).then(_=>{
-    this.setItem();//only if a new user--I
+    //this.setItem();//only if a new user--I
+
     });
   }
   logout() {

@@ -11,46 +11,6 @@ import { AngularFireAuth } from '@angular/fire/auth';
 export interface Videodata { itemlocation: string; }
 export interface VideodataId extends Videodata { id: string;}
 
-@Directive({
-  selector: '[holdable]'
-})
-export class HoldableDirective {
-
-  @Output() holdTime: EventEmitter<number> = new EventEmitter();
-  @Output() stop = new EventEmitter();
-  @Output() start = new EventEmitter();
-  stop$ = new Subject<any>();
-
-  constructor() {
-    this.stop$.subscribe(() => {
-      // this.holdTime.emit(0);
-      this.stop.emit();
-    });
-  }
-
-  @HostListener('mouseup')
-  onExit() {
-    console.log('detected up');
-    this.stop$.next();
-  }
-
-  @HostListener('mousedown') 
-  onHold() {
-    console.log('detected mousedown');
-    this.start.emit();
-    const ms = 100;
-
-    interval(ms).pipe(
-      takeUntil(this.stop$),
-      tap(v => {
-        this.holdTime.emit(v * ms)
-      }),
-    )
-    .subscribe();
-
-  }
-}
-
 declare var MediaRecorder: any;
 declare var Hammer: any;
 
@@ -68,12 +28,9 @@ export enum RecordingState {
 export class AppComponent implements AfterViewInit, OnInit {
   seconds: number;
   state: RecordingState = RecordingState.STOPPED;
-  audioURLs = [];
   private mediaRecorder;
   private recordings$: Observable<any>;
   Screentype = '';
-  eventText = '';
-  indicators;
   @ViewChild('done', { static: true })
   public mybutton: ElementRef;
   @ViewChild('video', { static: false })
@@ -92,6 +49,7 @@ export class AppComponent implements AfterViewInit, OnInit {
   private itemDoc: AngularFirestoreDocument<Videodata>;
   item: Observable<Videodata>;
   showmyvideo = true;
+  localvideo = true;
   constructor(    
     private sanitizer: DomSanitizer,
     private changeDetector: ChangeDetectorRef,
@@ -127,6 +85,7 @@ export class AppComponent implements AfterViewInit, OnInit {
       //pick up the uid from auth
       this.authdata.subscribe(data =>{
         if(data !== null){
+          this.localvideo = false;//if commented then it will show stream
           this.itemDoc = afs.doc<Videodata>(`videodata/${data.uid}`);
           this.item = this.itemDoc.valueChanges();
         }
@@ -183,6 +142,7 @@ clickme(){
       this.state = RecordingState.FORBIDDEN;
     }); 
   }
+  //onPress and onPressUp can be removed
   onPress(evt) {
     const ms = 100;
     this.state = RecordingState.RECORDING;
@@ -218,7 +178,7 @@ clickme(){
     this.stop$.next();
     this.mediaRecorder.stop();
   }
-
+//onStart, onHold, onStop can be removed
   onStart() {    
     this.mediaRecorder.start();
     this.recordings$.pipe(
@@ -248,12 +208,14 @@ clickme(){
     this.state = RecordingState.STOPPED;
     this.mediaRecorder.stop();
   }
+
   login(){
     this.ps.login();
   }
   logout(){
     this.ps.logout();
   }
+
   start(){
     const ms = 100;
     this.state = RecordingState.RECORDING;

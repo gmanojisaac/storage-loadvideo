@@ -1,8 +1,8 @@
 <div class="video-container" fxLayoutAlign= "center center" >
-  <video class="myvideo" [fxShow]= "showmyvideo" [ngStyle]="{'height': '80vh', 'position': 'fixed' }"   [ngStyle.xs]="{'height': '100vh','width': '120vw', 'position': 'fixed' }" #video autoplay>  </video>
-  <video class="myrecvideo" [fxShow]= "!showmyvideo"  [ngStyle]="{'height': '80vh', 'position': 'fixed' }"   [ngStyle.xs]="{'height': '100vh','width': '120vw', 'position': 'fixed' }" #recvideo  autoplay loop  > </video>
+  <video class="myvideo" [fxShow]= "showmyvideo && localvideo" [ngStyle]="{'height': '80vh', 'position': 'fixed' }"   [ngStyle.xs]="{'height': '100vh','width': '120vw', 'position': 'fixed' }" #video autoplay>  </video>
+  <video class="myrecvideo" [fxShow]= "!showmyvideo && localvideo"  [ngStyle]="{'height': '80vh', 'position': 'fixed' }"   [ngStyle.xs]="{'height': '100vh','width': '120vw', 'position': 'fixed' }" #recvideo  autoplay loop  > </video>
    <!--//pick up from auth-->
-  <video src="{{ (item| async)?.itemlocation }}" autoplay></video>  
+  <video [fxShow]= "!localvideo"  src="{{ (item| async)?.itemlocation }}" autoplay></video>  
  <!--// load from collection
     <ul>
       <li *ngFor = "let myvideo of myvideos | async">
@@ -31,7 +31,7 @@
   <div class="growing" fxFlex = "grow"></div>
 
   <div fxLayoutAlign="center center">
-    <div  #done [fxShow] = "this.Screentype === 'Handset_Port' || this.Screentype === 'Web_Land'" >
+    <div  #done [fxShow] = "Screentype === 'Handset_Port' || Screentype === 'Web_Land'" >
       <button mat-fab color="primary" style="width: 60px; height:60px;">
         {{ state === 'recording' ? seconds : 'REC' }}
       </button>
